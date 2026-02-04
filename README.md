@@ -1,0 +1,1 @@
+# credpal-fx-trading
