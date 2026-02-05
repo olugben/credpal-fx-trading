@@ -39,7 +39,7 @@ The application is fully containerized using **Docker Compose**.
 #### 1. Clone the repository
 
 ```bash
-git clone <your-github-repo-url>
+git clone https://github.com/olugben/credpal-fx-trading
 cd fx-trading-backend
 ```
 
@@ -52,7 +52,7 @@ DATABASE_HOST=db
 DATABASE_PORT=5432
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
-DATABASE_NAME=fx_trading
+DATABASE_NAME=fx_app
 ```
 
 #### 3. Start the application
@@ -70,7 +70,7 @@ http://localhost:3000
 Swagger documentation:
 
 ```
-http://localhost:3000/api
+http://localhost:3000/api/docs
 ```
 
 ---
@@ -86,7 +86,7 @@ http://localhost:3000/api
 ### 1. Clone the repository
 
 ```bash
-git clone <your-github-repo-url>
+git clone https://github.com/olugben/credpal-fx-trading
 cd fx-trading-backend
 ```
 
@@ -292,9 +292,7 @@ WalletService.exchangeCurrency()
 
 ---
 
-## (Optional) Architecture & Flow Diagrams
 
-Recommended diagrams (can be added to `/docs`):
 
 * Wallet funding flow
 * Currency conversion flow
@@ -306,7 +304,8 @@ These diagrams help illustrate transactional boundaries and data flow.
 ---
 
 ## Future Improvements
-
+Important Security Warning
+The authentication approach must be improved. User identity (user ID or email) must be derived from the JWT payload when using JWT-based authentication. Performing wallet or transaction operations directly based on an email provided in the request body or query parameters is unsafe
 * Idempotency keys for wallet operations
 * Rate caching and fallback FX providers
 * Integration tests with Testcontainers
@@ -321,6 +320,3 @@ Olugbenga Hammed
 
 ---
 
-## License
-
-UNLICENSED
