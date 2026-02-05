@@ -40,10 +40,12 @@ export class FxService {
   private async fetchRates(): Promise<Record<string, number>> {
     const cached = await this.redis.get('fx_rates');
     if (cached) {
+         
       return JSON.parse(cached);
     }
 
     try {
+    
       const response$ = this.httpService.get(
         `${this.apiUrl}/${this.baseCurrency}`,
       );
