@@ -48,11 +48,23 @@ cd fx-trading-backend
 Create a `.env` file in the root directory:
 
 ```env
-DATABASE_HOST=db
-DATABASE_PORT=5432
-DATABASE_USER=postgres
-DATABASE_PASSWORD=postgres
-DATABASE_NAME=fx_app
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=dbuser
+DB_PASS=dbpassword
+DB_NAME=fx_app
+
+
+EMAIL_USER=your_email_address
+EMAIL_PASS=your_email_password
+
+
+OTP_EXPIRY_MINUTES=10
+
+FX_API_URL=https://open.er-api.com/v6/latest
+FX_BASE_CURRENCY=NGN
+FX_CACHE_TTL_MINUTES=5
 ```
 
 #### 3. Start the application
