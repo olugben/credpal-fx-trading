@@ -13,10 +13,10 @@ export class Otp {
   user: User;
 
   @Column()
-  code: string; // the OTP itself
+  code: string; 
 
   @Column({ type: 'timestamptz' })
-  expiresAt: Date; // OTP expiration
+  expiresAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;

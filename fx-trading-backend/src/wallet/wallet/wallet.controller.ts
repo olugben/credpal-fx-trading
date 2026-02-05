@@ -4,6 +4,7 @@ import { Currency } from 'src/common/enums/currency.enum';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConvertCurrencyDto } from './dto/currencyConverterDto';
 
 @Controller('wallet')
 export class WalletController {
@@ -22,18 +23,15 @@ export class WalletController {
     return this.walletService.fundWalletByEmail(body.email, body.currency, body.amount);
   }
 @Post('convert')
-async convertCurrency(
-  @Body() body: { email: string; fromCurrency: Currency; toCurrency: Currency; amount: number },
-) {
-  // Lookup user by email
-  const user = await this.userRepo.findOne({ where: { email: body.email } });
+async convertCurrency(@Body() dto: ConvertCurrencyDto) {
+  const user = await this.userRepo.findOne({ where: { email: dto.email } });
   if (!user) throw new BadRequestException('User not found');
 
   return this.walletService.convertCurrency(
     user.id,
-    body.fromCurrency,
-    body.toCurrency,
-    body.amount,
+    dto.fromCurrency,
+    dto.toCurrency,
+    dto.amount,
   );
 }
 @Post('trade')

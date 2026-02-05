@@ -1,4 +1,4 @@
-// src/fx/fx.controller.ts
+
 import { Controller, Get, Query } from '@nestjs/common';
 import { FxService } from './fx.service';
 import { Currency } from 'src/common/enums/currency.enum';

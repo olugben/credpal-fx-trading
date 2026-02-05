@@ -111,7 +111,7 @@ export class WalletService {
 
       const savedBalance = await manager.save(WalletBalance, balance);
 
-      // Log transaction (non-blocking)
+      
       this.logTransaction({
         userId,
         type: TransactionType.FUND,
@@ -124,9 +124,7 @@ export class WalletService {
     });
   }
 
-  /**
-   * Fund wallet by user email
-   */
+ 
   async fundWalletByEmail(
     email: string,
     currency: Currency,
@@ -136,9 +134,6 @@ export class WalletService {
     return this.fundWallet(user.id, currency, amount);
   }
 
-  /**
-   * Convert currency from one to another
-   */
   async convertCurrency(
     userId: string,
     fromCurrency: Currency,
@@ -154,9 +149,6 @@ export class WalletService {
     );
   }
 
-  /**
-   * Convert currency by email
-   */
   async convertCurrencyByEmail(
     email: string,
     fromCurrency: Currency,
@@ -184,9 +176,7 @@ export class WalletService {
     );
   }
 
-  /**
-   * Trade wallet by email
-   */
+
   async tradeWalletByEmail(
     email: string,
     fromCurrency: Currency,
@@ -197,10 +187,7 @@ export class WalletService {
     return this.tradeWallet(user.id, fromCurrency, toCurrency, amount);
   }
 
-  /**
-   * Core exchange logic used by both convert and trade
-   * This eliminates code duplication between convert and trade
-   */
+
   private async exchangeCurrency(
     userId: string,
     fromCurrency: Currency,
@@ -208,15 +195,15 @@ export class WalletService {
     amount: number,
     transactionType: TransactionType.CONVERT | TransactionType.TRADE,
   ): Promise<{ message: string; rate: number; convertedAmount: string }> {
-    // Validate inputs
+
     this.validateAmount(amount);
     if (fromCurrency === toCurrency) {
       throw new BadRequestException('Cannot exchange the same currency');
     }
 
-    // Execute exchange in atomic transaction
+
     return await this.dataSource.transaction(async (manager) => {
-      // Lock wallet
+    
       const wallet = await manager.findOne(Wallet, {
         where: { userId },
         lock: { mode: 'pessimistic_write' },
@@ -226,7 +213,7 @@ export class WalletService {
         throw new NotFoundException('Wallet not found');
       }
 
-      // Lock source balance
+   
       const fromBalance = await manager.findOne(WalletBalance, {
         where: { walletId: wallet.id, currency: fromCurrency },
         lock: { mode: 'pessimistic_write' },
@@ -236,7 +223,7 @@ export class WalletService {
         throw new NotFoundException(`Balance for ${fromCurrency} not found`);
       }
 
-      // Check sufficient balance using Decimal for precision
+     
       const currentBalance = new Decimal(fromBalance.balance);
       const amountDecimal = new Decimal(amount);
 
@@ -246,25 +233,25 @@ export class WalletService {
         );
       }
 
-      // Lock destination balance
+  
       let toBalance = await manager.findOne(WalletBalance, {
         where: { walletId: wallet.id, currency: toCurrency },
         lock: { mode: 'pessimistic_write' },
       });
 
-      // Get exchange rate
+    
       const rate = await this.fxService.getRate(fromCurrency, toCurrency);
       this.validateRate(rate, fromCurrency, toCurrency);
 
-      // Calculate converted amount
+     
       const rateDecimal = new Decimal(rate);
       const convertedAmount = amountDecimal.times(rateDecimal);
 
-      // Update source balance
+
       fromBalance.balance = currentBalance.minus(amountDecimal).toFixed(2);
       await manager.save(WalletBalance, fromBalance);
 
-      // Update or create destination balance
+  
       if (toBalance) {
         const toCurrentBalance = new Decimal(toBalance.balance);
         toBalance.balance = toCurrentBalance.plus(convertedAmount).toFixed(2);
@@ -278,7 +265,7 @@ export class WalletService {
         await manager.save(WalletBalance, toBalance);
       }
 
-      // Log transaction (non-blocking)
+
       this.logTransaction({
         userId,
         type: transactionType,
@@ -299,9 +286,7 @@ export class WalletService {
     });
   }
 
-  /**
-   * Helper: Find user by email or throw
-   */
+
   private async findUserByEmail(email: string): Promise<User> {
     const user = await this.userRepo.findOne({ where: { email } });
     if (!user) {
@@ -310,9 +295,6 @@ export class WalletService {
     return user;
   }
 
-  /**
-   * Helper: Validate amount is positive
-   */
   private validateAmount(amount: number): void {
     if (!amount || amount <= 0) {
       throw new BadRequestException('Amount must be greater than zero');
@@ -323,9 +305,6 @@ export class WalletService {
     }
   }
 
-  /**
-   * Helper: Validate exchange rate
-   */
   private validateRate(
     rate: number,
     fromCurrency: Currency,
@@ -338,10 +317,7 @@ export class WalletService {
     }
   }
 
-  /**
-   * Helper: Log transaction asynchronously (non-blocking)
-   * Failures in transaction logging should not fail the main operation
-   */
+ 
   private logTransaction(data: {
     userId: string;
     type: TransactionType;
